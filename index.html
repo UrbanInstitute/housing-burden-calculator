@@ -1,46 +1,93 @@
 <html>
 <head>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script> -->
 <script language="JavaScript">
-function makeAPICall() {
 
-
-
-	var street = $('#street').val()
-	var city = $('#city').val()
-	var state = $('#state').val()
-
-    var contentType ="application/x-www-form-urlencoded; charset=utf-8";
- 
-    if(window.XDomainRequest)
-        contentType = "text/plain";
-
-    var testString = "http://geocoding.geo.census.gov/geocoder/geographies/address?street=4600+Silver+Hill+Rd&city=Suitland&state=MD&benchmark=Public_AR_Census2010&vintage=Census2010_Census2010&layers=14&format=json"
-	var urlString = "http://geocoding.geo.census.gov/geocoder/geographies/address?street="+ street + "&city="+ city +"&state="+ state +"&benchmark=Public_AR_Census2010&vintage=Census2010_Census2010&layers=14&format=json"
-
-	// $.get(urlString, function( data ) {
-	// 	//replace body with element that contains JSON response, or maybe keep as body
- //  		$( "body" ).html( data );
- //  		//replace key1, key2 with fields that lead to TRACT
- //  			console.log(data["result"]["addressMatches"]["geographies"])
-	// 	});
-
-	$.ajax({
-	    url: testString,
-	    // data: data,	
-	    type: 'GET',
-	    // contentType: contentType,
-	    dataType:"jsonp", 
-	    success: function() { console.log("Success"); },
-	    error: function() { console.log('Failed!'); }
-	    // beforeSend: setHeader
-	});
+// Create the XHR object.
+function createCORSRequest(method, url) {
+  var xhr = new XMLHttpRequest();
+  if ("withCredentials" in xhr) {
+    // XHR for Chrome/Firefox/Opera/Safari.
+    xhr.open(method, url, true);
+  } else if (typeof XDomainRequest != "undefined") {
+    // XDomainRequest for IE.
+    xhr = new XDomainRequest();
+    xhr.open(method, url);
+  } else {
+    // CORS not supported.
+    xhr = null;
+  }
+  return xhr;
 }
 
-$( "#submit_button" ).submit(function( event ) {
-  makeAPICall()	
-  event.preventDefault();
-});
+// Helper method to parse the title tag from the response.
+function getTitle(text) {
+  return text.match('<title>(.*)?</title>')[1];
+}
+
+// Make the actual CORS request.
+function makeCorsRequest() {
+  var url = "http://geocoding.geo.census.gov/geocoder/geographies/address?street=4600+Silver+Hill+Rd&city=Suitland&state=MD&benchmark=Public_AR_Census2010&vintage=Census2010_Census2010&layers=14&format=json";
+
+  var xhr = createCORSRequest('GET', url);
+  if (!xhr) {
+    alert('CORS not supported');
+    return;
+  }
+
+  // Response handlers.
+  xhr.onloadstart = function(){
+  	console.log("starting request...")
+  }
+
+  xhr.onload = function() {
+    var text = xhr.responseText;
+    var title = getTitle(text);
+    console.log('Response from CORS request to ' + url + ': ' + title);
+  };
+
+  xhr.onerror = function() {
+    console.log('there was an error making the request.');
+  };
+
+  xhr.send();
+}
+
+// 	var street = $('#street').val()
+// 	var city = $('#city').val()
+// 	var state = $('#state').val()
+
+//     var contentType ="application/x-www-form-urlencoded; charset=utf-8";
+ 
+//     if(window.XDomainRequest)
+//         contentType = "text/plain";
+
+//     var testString = "http://geocoding.geo.census.gov/geocoder/geographies/address?street=4600+Silver+Hill+Rd&city=Suitland&state=MD&benchmark=Public_AR_Census2010&vintage=Census2010_Census2010&layers=14&format=json"
+// 	var urlString = "http://geocoding.geo.census.gov/geocoder/geographies/address?street="+ street + "&city="+ city +"&state="+ state +"&benchmark=Public_AR_Census2010&vintage=Census2010_Census2010&layers=14&format=json"
+
+// 	// $.get(urlString, function( data ) {
+// 	// 	//replace body with element that contains JSON response, or maybe keep as body
+//  //  		$( "body" ).html( data );
+//  //  		//replace key1, key2 with fields that lead to TRACT
+//  //  			console.log(data["result"]["addressMatches"]["geographies"])
+// 	// 	});
+
+// 	$.ajax({
+// 	    url: testString,
+// 	    // data: data,	
+// 	    type: 'GET',
+// 	    // contentType: contentType,
+// 	    dataType:"jsonp", 
+// 	    success: function() { console.log("Success"); },
+// 	    error: function() { console.log('Failed!'); }
+// 	    // beforeSend: setHeader
+// 	});
+// }
+
+// $( "#submit_button" ).submit(function( event ) {
+//   makeAPICall()	
+//   event.preventDefault();
+// });
 
 </script>
 </head>
