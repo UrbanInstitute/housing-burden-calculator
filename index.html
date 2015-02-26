@@ -1,148 +1,30 @@
 <html>
 <head>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+
 <script language="JavaScript">
-
-// Create the XHR object.
-// function createCORSRequest(method, url) {
-//   var xhr = new XMLHttpRequest();
-//   if ("withCredentials" in xhr) {
-//     // XHR for Chrome/Firefox/Opera/Safari.
-//     xhr.open(method, url, true);
-//   } else if (typeof XDomainRequest != "undefined") {
-//     // XDomainRequest for IE.
-//     xhr = new XDomainRequest();
-//     xhr.open(method, url);
-//   } else {
-//     // CORS not supported.
-//     xhr = null;
-//   }
-//   return xhr;
-// }
-
-// // Helper method to parse the title tag from the response.
-// function getTitle(text) {
-//   return text.match('<title>(.*)?</title>')[1];
-// }
-
-// // Make the actual CORS request.
-// function makeCorsRequest() {
-//   var url = "http://geocoding.geo.census.gov/geocoder/geographies/address?street=4600+Silver+Hill+Rd&city=Suitland&state=MD&benchmark=Public_AR_Census2010&vintage=Census2010_Census2010&layers=14&format=json";
-
-//   var xhr = createCORSRequest('GET', url);
-//   if (!xhr) {
-//     alert('CORS not supported');
-//     return;
-//   }
-
-//   // Response handlers.
-//   xhr.onloadstart = function(){
-//   	console.log("starting request...")
-//   }
-
-//   xhr.onload = function() {
-//     var text = xhr.responseText;
-//     var title = getTitle(text);
-//     console.log('Response from CORS request to ' + url + ': ' + title);
-//   };
-
-//   xhr.onerror = function() {
-//     console.log('there was an error making the request.');
-//   };
-
-//   xhr.send();
-// }
-
-	var street = $('#street').val()
-	var city = $('#city').val()
-	var state = $('#state').val()
-
-    var contentType ="application/x-www-form-urlencoded; charset=utf-8";
- 
-    if(window.XDomainRequest)
-        contentType = "text/plain";
-
-    var osmString = "http://nominatim.openstreetmap.org/search?street=20+main+street&city=exeter&state=NH&postalcode=03833&format=json&addressdetails=1&limit=1"
-
-    var censusString = "http://geocoding.geo.census.gov/geocoder/geographies/address?street=4600+Silver+Hill+Rd&city=Suitland&state=MD&benchmark=Public_AR_Census2010&vintage=Census2010_Census2010&layers=14&format=json"
-// street=<housenumber> <streetname>
-//  city=<city>
-//  county=<county>
-//  state=<state>
-//  country=<country>
-	// $.get(urlString, function( data ) {
-	// 	//replace body with element that contains JSON response, or maybe keep as body
- //  		$( "body" ).html( data );
- //  		//replace key1, key2 with fields that lead to TRACT
- //  			console.log(data["result"]["addressMatches"]["geographies"])
-	// 	});
-
-	$.ajax({
-	    url: osmString,
-	    // data: data,	
-	    type: 'GET',
-	    // contentType: contentType,
-	    dataType:"json", 
-	    success: function(data) { 
-	    		// http://data.fcc.gov/api/block/find?format=jsonp&latitude=28.35975&longitude=-81.421988&showall=true
-	    	var lat = data[0].lat
-	    	var lon = data[0].lon
-	    	var fccString = "http://data.fcc.gov/api/block/find?format=jsonp&latitude=" + lat + "&longitude=" + lon + "&showall=true&callback=JSONPCallback"
-	 
-	    	var jsonp = {
-		    callbackCounter: 0,
-		 
-			    fetch: function(url, callback) {
-			        var fn = 'JSONPCallback_' + this.callbackCounter++;
-			        window[fn] = this.evalJSONP(callback);
-			        url = url.replace('=JSONPCallback', '=' + fn);
-			 
-			        var scriptTag = document.createElement('SCRIPT');
-			        scriptTag.src = url;
-			        document.getElementsByTagName('HEAD')[0].appendChild(scriptTag);
-			    },
-			 
-			    evalJSONP: function(callback) {
-			        return function(data) {
-			            var validJSON = false;
-			        if (typeof data == "string") {
-			            try {validJSON = JSON.parse(data);} catch (e) {
-			                /*invalid JSON*/}
-			        } else {
-			            validJSON = JSON.parse(JSON.stringify(data));
-			                window.console && console.warn(
-			                'response data was not a JSON string');
-			            }
-			            if (validJSON) {
-			                callback(validJSON);
-			            } else {
-			                throw("JSONP call returned invalid or empty JSON");
-			            }
-			        }
-			    }
-			}
-
-			jsonp.fetch(fccString, function(data) {console.log(data.Block.FIPS)});
-	    },
-	    error: function() { console.log('Failed!'); }
-	    // beforeSend: setHeader
-	});
-
-
-
-$( "#submit_button" ).submit(function( event ) {
-  makeAPICall()	
-  event.preventDefault();
-});
-
 </script>
 </head>
 <body>
-	<form>
+	<div>
 		Street <input type = "text" id = "street"></input>
 		City <input type = "text" id = "city"></input>
 		State <input type = "text" id = "state"></input>
-		<input type = "submit" id = "submit_button"></input>
-	</form>
+		Zip <input type = "text" id = "zip"></input>
+		<button id = "submit_button">Button</button>
+	</div>
+	<div>
+		I AM A MAP <br/>
+		<textarea id = "fake-map" rows = "10" cols = "10"></textarea>
+		<textarea id = "fake-burden" rows = "10" cols = "10" style = "display:inline; width:150px; margin-left:30px"></textarea>
+		<div id = "fake-error" style = "font-size:300; display:inline; color:red"></div>
+	</div>
+
+<script src="js/vendor/jquery.min.js"></script>
+<script src="js/main.js"></script>
+<script>
+$("#submit_button").on("click",function() {
+	makeAPICall()
+});	
+</script>
 </body>
 </html>
