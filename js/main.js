@@ -71,7 +71,7 @@ function badAddress(){
 }
 
 function showBurden(data){
-	$("#fake-burden").text(data.Block.FIPS)
+	$("#fake-burden").text(data)
 }
 
 
